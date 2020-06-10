@@ -40,6 +40,8 @@ public class DNSRequest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
+        Logger logger = Logger.INSTANCE;
+
         /*
          *** Build a DNS Request Frame ****
          https://stackoverflow.com/questions/36743226/java-send-udp-packet-to-dns-server
@@ -77,6 +79,7 @@ public class DNSRequest {
             // Class 0x01 = IN
             dos.writeShort(0x0001);
         } catch (IOException e) {
+            logger.write(String.format("An error occurs while building DNS frame: %s\n", e.getMessage()));
             return new DNSResponse(domainName);
         }
 
@@ -114,26 +117,27 @@ public class DNSRequest {
                 for (int i = 0; i < recLen; i++) {
                     record[i] = din.readByte();
                 }
-                serviceInfo.add("Record: " + new String(record, "UTF-8"));
+                serviceInfo.add(String.format("Record: %s", new String(record, "UTF-8")));
             }
 
             //Add Record Type, Class, Field, Type, Class, TTL
             for (int i = 0; i < 5; i++) {
                 serviceInfo.add(String.format("%x", din.readShort()));
             }
-            serviceInfo.add("TTL: 0x" + String.format("%x", din.readInt()));
+            serviceInfo.add(String.format("TTL: 0x%x", din.readInt()));
 
             short addrLen = din.readShort();
-            serviceInfo.add("Len: 0x" + String.format("%x", addrLen));
+            serviceInfo.add(String.format("Len: 0x%x", addrLen));
 
             domainNameIp = "";
             for (int i = 0; i < addrLen; i++ ) {
-                domainNameIp += ("" + String.format("%d", (din.readByte() & 0xFF)));
+                domainNameIp += (String.format("%d", (din.readByte() & 0xFF)));
                 if (addrLen - i > 1) { // dot in the end of ip is not needed
                     domainNameIp += ".";
                 }
             }
         } catch (IOException e) {
+            logger.write(String.format("An error occurs while working with sockets: %s\n", e.getMessage()));
             return new DNSResponse(domainName);
         }
 
@@ -146,10 +150,11 @@ public class DNSRequest {
 
 
     //This temp realization is here from Stackoverflow. It's ugly, but it works
-    //Not quite well. With lib telegrambots its generate strange exception, that processing by lib silently
     private static String getPtr(final String ip) {
         String ptr = "";
         final String[] bytes = ip.split("\\.");
+        Logger logger = Logger.INSTANCE;
+
         if (bytes.length == 4)
         {
             try
@@ -186,12 +191,11 @@ public class DNSRequest {
             }
             catch (final javax.naming.NamingException e)
             {
-                // No reverse DNS that we could find, try with InetAddress
-                System.out.println("Some shit");
+                logger.write(String.format("No reverse DNS or an error occurred: %s\n", e.getMessage()));
             }
         }
 
-        if (ptr == null || ptr.isEmpty())
+        if (ptr.isEmpty())
         {
             try
             {

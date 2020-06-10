@@ -71,16 +71,15 @@ public class Bot extends TelegramLongPollingBot {
     private String buildMessage(ArrayList<DNSResponse> responses) {
 
         String message = "";
-        message += responses.get(0).getDomain() + " \n";
+        message += String.format("%s \n", responses.get(0).getDomain());
 
         for (DNSResponse response : responses) {
             if (response.getIp().isEmpty()) {
-                message += response.getDnsServer() + ": no data\n";
+                message += String.format("%s: no data\n", response.getDnsServer());
             } else {
-                message += response.getDnsServer() + ": " + response.getIp() + ": " + response.getPtr() + "\n";
+                message += String.format("%s: %s: %s\n", response.getDnsServer(), response.getIp(), response.getPtr());
             }
         }
         return message;
     }
-
 }
