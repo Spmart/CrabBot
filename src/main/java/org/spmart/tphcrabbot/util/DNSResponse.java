@@ -1,5 +1,8 @@
 package org.spmart.tphcrabbot.util;
 
+/**
+ * DNS response data object.
+ */
 public class DNSResponse {
 
     private String domain;
@@ -7,6 +10,13 @@ public class DNSResponse {
     private String ip;
     private String ptr;
 
+    /**
+     * Create DNSResponse object.
+     * @param domain Domain name.
+     * @param dnsServer DNS server hostname.
+     * @param ip IP address.
+     * @param ptr PTR (reverse DNS) record.
+     */
     public DNSResponse(String domain, String dnsServer, String ip, String ptr) {
         this.domain = domain;
         this.dnsServer = dnsServer;
@@ -14,6 +24,13 @@ public class DNSResponse {
         this.ptr = ptr;
     }
 
+    /**
+     * Create DNSResponse object.
+     * This constructor should be used if PTR not found.
+     * @param domain Domain name.
+     * @param dnsServer DNS server hostname.
+     * @param ip IP address.
+     */
     public DNSResponse(String domain, String dnsServer, String ip) {
         this.domain = domain;
         this.dnsServer = dnsServer;
@@ -21,11 +38,16 @@ public class DNSResponse {
         ptr = "";
     }
 
+    /**
+     * Create DNSResponse object.
+     * This constructor should be used if you want to send an empty response.
+     * @param domain Domain name.
+     */
     public DNSResponse(String domain) {
         this.domain = domain;
-        dnsServer = "Probably, it's an error!";
-        ip = "Probably, it's an error!";
-        ptr = "Probably, it's an error!";
+        dnsServer = "Empty response";
+        ip = "";
+        ptr = "";
     }
 
     public String getDomain() {

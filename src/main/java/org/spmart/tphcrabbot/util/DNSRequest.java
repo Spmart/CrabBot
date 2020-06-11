@@ -7,17 +7,31 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+/**
+ * DNS request that can be built from dns server and domain.
+ */
 public class DNSRequest {
+
     private static final int DNS_SERVER_PORT = 53;
     private String dnsServerHostname;
     private String domainName;
 
-
+    /**
+     * Create a DNS request object with custom DNS server and domain name information
+     * about which you need.
+     * @param dnsServerHostname DNS server. Can be a domain or IP.
+     * @param domainName Domain, that need to be checked.
+     */
     public DNSRequest(String dnsServerHostname, String domainName) {
         this.dnsServerHostname = dnsServerHostname;
         this.domainName = domainName;
     }
 
+    /**
+     * Create a DNS request object with 8.8.8.8 DNS server and domain name information
+     * about which you need.
+     * @param domainName Domain, that need to be checked.
+     */
     public DNSRequest(String domainName) {
         this.dnsServerHostname = "8.8.8.8";
         this.domainName = domainName;
@@ -36,6 +50,10 @@ public class DNSRequest {
         }
     }
 
+    /**
+     * Send DNS request.
+     * @return DNSResponse object with domain name, dns server hostname, domain IP and PTR.
+     */
     public DNSResponse send() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -149,6 +167,11 @@ public class DNSRequest {
     }
 
 
+    /**
+     * Send RDNS query and get PTR for IP.
+     * @param ip IP address splited by dots like that 194.53.112.31
+     * @return PTR record.
+     */
     //This temp realization is here from Stackoverflow. It's ugly, but it works
     private static String getPtr(final String ip) {
         String ptr = "";

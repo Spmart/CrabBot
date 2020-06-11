@@ -13,6 +13,9 @@ import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
+    /**
+     * Pack of DNS servers
+     */
     private static final String NS1_REG_RU = "ns1.reg.ru";
     private static final String NS2_REG_RU = "ns2.reg.ru";
     private static final String NS1_HOSTING_REG_RU = "ns1.hosting.reg.ru";
@@ -51,6 +54,11 @@ public class Bot extends TelegramLongPollingBot {
         return BotIdentifier.getApiToken();
     }
 
+    /**
+     * Send all DNS requests to all specified DNS servers.
+     * @param domainName Domain that's IP is needed.
+     * @return Collection with DNSResponse objects.
+     */
     private ArrayList<DNSResponse> sendRequests(String domainName) {
 
         ArrayList<String> dnsServers = new ArrayList<>(List.of(NS1_REG_RU, NS2_REG_RU, NS1_HOSTING_REG_RU,
@@ -68,6 +76,10 @@ public class Bot extends TelegramLongPollingBot {
         return dnsResponses;
     }
 
+    /**
+     * @param responses Collection with DNSResponse objects.
+     * @return Ready to send message.
+     */
     private String buildMessage(ArrayList<DNSResponse> responses) {
 
         String message = "";
