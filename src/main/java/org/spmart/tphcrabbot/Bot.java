@@ -3,6 +3,7 @@ package org.spmart.tphcrabbot;
 import org.spmart.tphcrabbot.util.BotIdentifier;
 import org.spmart.tphcrabbot.util.DNSRequest;
 import org.spmart.tphcrabbot.util.DNSResponse;
+import org.spmart.tphcrabbot.util.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -30,18 +31,21 @@ public class Bot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             Long chatID = update.getMessage().getChatId();
             String inMessageText = update.getMessage().getText();
+            SendMessage message = new SendMessage();
 
-            ArrayList<DNSResponse> dnsResponses = sendRequests(inMessageText);
+            if (inMessageText.equals("/start")) {
+                // Actually, I should use AbilityBot here, but other commands I don't need.
+                message.setChatId(chatID).setText("Hello friend! Send me a domain!");
+            } else {
+                ArrayList<DNSResponse> dnsResponses = sendRequests(inMessageText);
+                String outMessageText = buildMessage(dnsResponses);
+                message.setChatId(chatID).setText(outMessageText);
+            }
 
-            String outMessageText = buildMessage(dnsResponses);
-
-            SendMessage message = new SendMessage()
-                    .setChatId(chatID)
-                    .setText(outMessageText);
             try {
                 execute(message); // Call method to send the message
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                Logger.INSTANCE.write(String.format("Error! Can't send message! %s\n", e.getMessage()));
             }
         }
     }

@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -37,17 +38,26 @@ public class DNSRequest {
         this.domainName = domainName;
     }
 
+    /**
+     * Returns list of IP for domain. Uses InetAddress to find domain IP. You can't specify DNS server here.
+     * Uses system DNS settings.
+     * @param host Hostname, which IP is needed.
+     * @return List of IP-addresses.
+     */
     @Deprecated
-    private String getIP(String host) {
+    private ArrayList<String> getIP(String host) {
+        ArrayList<String> ipList = new ArrayList<>();
         try {
-            InetAddress[] IPList = InetAddress.getAllByName(host);
-            //for (int i = 0; i < IP.length; i++) {
-            //    System.out.println("IPv4 : " + IP[i].getHostAddress());
-            //}
-            return IPList[0].getHostAddress();
+            InetAddress[] inetAddresses = InetAddress.getAllByName(host);
+            for (InetAddress ip : inetAddresses) {
+                ipList.add(ip.getHostAddress());
+            }
         } catch (UnknownHostException uhe) {
-            return "Unknown Host!";
+            if (ipList.isEmpty()) {
+                ipList.add("Unknown host");
+            }
         }
+        return ipList;
     }
 
     /**
@@ -135,7 +145,7 @@ public class DNSRequest {
                 for (int i = 0; i < recLen; i++) {
                     record[i] = din.readByte();
                 }
-                serviceInfo.add(String.format("Record: %s", new String(record, "UTF-8")));
+                serviceInfo.add(String.format("Record: %s", new String(record, StandardCharsets.UTF_8)));
             }
 
             //Add Record Type, Class, Field, Type, Class, TTL
